@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>药剂师审方平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 登录页面 */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .login-form {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-form h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #1890ff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #40a9ff;
+        }
+        
+        .btn-block {
+            width: 100%;
+        }
+        
+        /* 主布局 */
+        .main-layout {
+            display: flex;
+            flex: 1;
+        }
+        
+        /* 侧边栏 */
+        .sidebar {
+            width: 200px;
+            background-color: #001529;
+            color: white;
+            padding: 20px 0;
+        }
+        
+        .sidebar-logo {
+            padding: 0 20px;
+            margin-bottom: 30px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 10px 20px;
+            color: rgba(255,255,255,0.65);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        /* 主内容区 */
+        .content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .content-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #1890ff;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+        }
+        
+        /* 卡片 */
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        /* 统计卡片 */
+        .stats-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            flex: 1;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* 表格 */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .table th {
+            background-color: #fafafa;
+            font-weight: 600;
+        }
+        
+        .table tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        /* 处方详情 */
+        .prescription-detail {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+            padding: 20px;
+        }
+        
+        .detail-section {
+            margin-bottom: 20px;
+        }
+        
+        .detail-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 8px;
+        }
+        
+        .detail-label {
+            width: 120px;
+            font-weight: 500;
+        }
+        
+        .detail-value {
+            flex: 1;
+        }
+        
+        /* 审核操作区 */
+        .audit-actions {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e8e8e8;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-success {
+            background-color: #52c41a;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #73d13d;
+        }
+        
+        .btn-danger {
+            background-color: #ff4d4f;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #ff7875;
+        }
+        
+        /* 模态框 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        /* 人脸识别组件 */
+        .face-recognition {
+            text-align: center;
+            padding: 30px;
+            border: 2px dashed #d9d9d9;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .face-recognition canvas {
+            margin: 20px 0;
+            border: 1px solid #d9d9d9;
+        }
+        
+        /* 隐藏类 */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录页面 -->
+    <div id="login-page" class="login-container">
+        <div class="login-form">
+            <h2>药剂师审方平台</h2>
+            <form>
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" placeholder="请输入用户名">
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" placeholder="请输入密码">
+                </div>
+                <div class="form-group">
+                    <label for="role">角色</label>
+                    <select id="role" style="width: 100%; padding: 10px; border: 1px solid #d9d9d9; border-radius: 4px;">
+                        <option value="pharmacist">药剂师</option>
+                        <option value="admin">管理人员</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-primary btn-block" onclick="login()">登录</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 药剂师工作台 -->
+    <div id="pharmacist-dashboard" class="container hidden">
+        <div class="main-layout">
+            <aside class="sidebar">
+                <div class="sidebar-logo">药剂师审方平台</div>
+                <ul class="sidebar-menu">
+                    <li><a href="#" class="active" onclick="showSection('dashboard')">工作台</a></li>
+                    <li><a href="#" onclick="showSection('prescriptions')">处方列表</a></li>
+                    <li><a href="#" onclick="showSection('profile')">个人中心</a></li>
+                    <li><a href="#" onclick="logout()">退出登录</a></li>
+                </ul>
+            </aside>
+            <main class="content">
+                <div class="content-header">
+                    <h1 class="content-title" id="section-title">工作台</h1>
+                    <div class="user-info">
+                        <div class="user-avatar">张</div>
+                        <span>张药师</span>
+                    </div>
+                </div>
+                
+                <!-- 工作台 section -->
+                <div id="dashboard-section">
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">待审核处方</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">85</div>
+                            <div class="stat-label">今日已审核</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">98%</div>
+                            <div class="stat-label">审核通过率</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">待审核处方</h3>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>处方编号</th>
+                                    <th>患者姓名</th>
+                                    <th>开具医师</th>
+                                    <th>开具时间</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>RX202602270001</td>
+                                    <td>王小明</td>
+                                    <td>李医生</td>
+                                    <td>2026-02-27 10:30</td>
+                                    <td><span style="color: #faad14;">待审核</span></td>
+                                    <td><button class="btn btn-primary" onclick="viewPrescription('RX202602270001')">审核</button></td>
+                                </tr>
+                                <tr>
+                                    <td>RX202602270002</td>
+                                    <td>李小华</td>
+                                    <td>王医生</td>
+                                    <td>2026-02-27 09:15</td>
+                                    <td><span style="color: #faad14;">待审核</span></td>
+                                    <td><button class="btn btn-primary" onclick="viewPrescription('RX202602270002')">审核</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- 处方列表 section -->
+                <div id="prescriptions-section" class="hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">处方列表</h3>
+                            <div>
+                                <input type="text" placeholder="搜索处方编号" style="padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px; margin-right: 10px;">
+                                <button class="btn btn-primary">搜索</button>
+                            </div>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>处方编号</th>
+                                    <th>患者姓名</th>
+                                    <th>开具医师</th>
+                                    <th>开具时间</th>
+                                    <th>审核时间</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>RX202602270001</td>
+                                    <td>王小明</td>
+                                    <td>李医生</td>
+                                    <td>2026-02-27 10:30</td>
+                                    <td>-</td>
+                                    <td><span style="color: #faad14;">待审核</span></td>
+                                    <td><button class="btn btn-primary" onclick="viewPrescription('RX202602270001')">审核</button></td>
+                                </tr>
+                                <tr>
+                                    <td>RX202602260056</td>
+                                    <td>张三</td>
+                                    <td>赵医生</td>
+                                    <td>2026-02-26 16:45</td>
+                                    <td>2026-02-26 17:00</td>
+                                    <td><span style="color: #52c41a;">审核通过</span></td>
+                                    <td><button class="btn btn-primary" onclick="viewPrescription('RX202602260056')">查看</button></td>
+                                </tr>
+                                <tr>
+                                    <td>RX202602260055</td>
+                                    <td>李四</td>
+                                    <td>钱医生</td>
+                                    <td>2026-02-26 15:30</td>
+                                    <td>2026-02-26 15:45</td>
+                                    <td><span style="color: #ff4d4f;">审核拒绝</span></td>
+                                    <td><button class="btn btn-primary" onclick="viewPrescription('RX202602260055')">查看</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- 个人中心 section -->
+                <div id="profile-section" class="hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">个人信息</h3>
+                        </div>
+                        <div class="detail-section">
+                            <div class="detail-row">
+                                <div class="detail-label">姓名</div>
+                                <div class="detail-value">张药师</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">工号</div>
+                                <div class="detail-value">PH20260001</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">执业证书号</div>
+                                <div class="detail-value">123456789012345678</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">所属机构</div>
+                                <div class="detail-value">互联网医院</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">联系电话</div>
+                                <div class="detail-value">138****1234</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- 管理人员后台 -->
+    <div id="admin-dashboard" class="container hidden">
+        <div class="main-layout">
+            <aside class="sidebar">
+                <div class="sidebar-logo">药剂师审方平台</div>
+                <ul class="sidebar-menu">
+                    <li><a href="#" class="active" onclick="showAdminSection('dashboard')">工作台</a></li>
+                    <li><a href="#" onclick="showAdminSection('pharmacists')">药剂师管理</a></li>
+                    <li><a href="#" onclick="showAdminSection('prescriptions')">处方管理</a></li>
+                    <li><a href="#" onclick="showAdminSection('settings')">系统设置</a></li>
+                    <li><a href="#" onclick="logout()">退出登录</a></li>
+                </ul>
+            </aside>
+            <main class="content">
+                <div class="content-header">
+                    <h1 class="content-title" id="admin-section-title">工作台</h1>
+                    <div class="user-info">
+                        <div class="user-avatar">管</div>
+                        <span>管理员</span>
+                    </div>
+                </div>
+                
+                <!-- 管理员工作台 section -->
+                <div id="admin-dashboard-section">
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <div class="stat-number">25</div>
+                            <div class="stat-label">注册药剂师</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">128</div>
+                            <div class="stat-label">今日处方数</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">95%</div>
+                            <div class="stat-label">审核通过率</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">15</div>
+                            <div class="stat-label">待审核处方</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">近期审核统计</h3>
+                        </div>
+                        <div style="height: 300px; background-color: #f5f5f5; display: flex; justify-content: center; align-items: center;">
+                            <p>图表区域</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 药剂师管理 section -->
+                <div id="admin-pharmacists-section" class="hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">药剂师管理</h3>
+                            <button class="btn btn-primary" onclick="addPharmacist()">添加药剂师</button>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>工号</th>
+                                    <th>姓名</th>
+                                    <th>执业证书号</th>
+                                    <th>所属机构</th>
+                                    <th>联系电话</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>PH20260001</td>
+                                    <td>张药师</td>
+                                    <td>123456789012345678</td>
+                                    <td>互联网医院</td>
+                                    <td>138****1234</td>
+                                    <td><span style="color: #52c41a;">正常</span></td>
+                                    <td>
+                                        <button class="btn btn-primary" onclick="editPharmacist('PH20260001')">编辑</button>
+                                        <button class="btn btn-danger" onclick="deletePharmacist('PH20260001')">删除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>PH20260002</td>
+                                    <td>李药师</td>
+                                    <td>876543210987654321</td>
+                                    <td>互联网医院</td>
+                                    <td>139****5678</td>
+                                    <td><span style="color: #52c41a;">正常</span></td>
+                                    <td>
+                                        <button class="btn btn-primary" onclick="editPharmacist('PH20260002')">编辑</button>
+                                        <button class="btn btn-danger" onclick="deletePharmacist('PH20260002')">删除</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- 处方管理 section -->
+                <div id="admin-prescriptions-section" class="hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">处方管理</h3>
+                            <div>
+                                <input type="text" placeholder="搜索处方编号" style="padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px; margin-right: 10px;">
+                                <button class="btn btn-primary">搜索</button>
+                            </div>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>处方编号</th>
+                                    <th>患者姓名</th>
+                                    <th>开具医师</th>
+                                    <th>开具时间</th>
+                                    <th>审核药剂师</th>
+                                    <th>审核时间</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>RX202602270001</td>
+                                    <td>王小明</td>
+                                    <td>李医生</td>
+                                    <td>2026-02-27 10:30</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td><span style="color: #faad14;">待审核</span></td>
+                                    <td><button class="btn btn-primary" onclick="viewPrescription('RX202602270001')">查看</button></td>
+                                </tr>
+                                <tr>
+                                    <td>RX202602260056</td>
+                                    <td>张三</td>
+                                    <td>赵医生</td>
+                                    <td>2026-02-26 16:45</td>
+                                    <td>张药师</td>
+                                    <td>2026-02-26 17:00</td>
+                                    <td><span style="color: #52c41a;">审核通过</span></td>
+                                    <td><button class="btn btn-primary" onclick="viewPrescription('RX202602260056')">查看</button></td>
+                                </tr>
+                                <tr>
+                                    <td>RX202602260055</td>
+                                    <td>李四</td>
+                                    <td>钱医生</td>
+                                    <td>2026-02-26 15:30</td>
+                                    <td>李药师</td>
+                                    <td>2026-02-26 15:45</td>
+                                    <td><span style="color: #ff4d4f;">审核拒绝</span></td>
+                                    <td><button class="btn btn-primary" onclick="viewPrescription('RX202602260055')">查看</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- 系统设置 section -->
+                <div id="admin-settings-section" class="hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">系统设置</h3>
+                        </div>
+                        <div class="detail-section">
+                            <h3>审方规则设置</h3>
+                            <div class="detail-row">
+                                <div class="detail-label">处方自动分配</div>
+                                <div class="detail-value">
+                                    <select style="padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px;">
+                                        <option value="round-robin">轮询分配</option>
+                                        <option value="load-balancing">负载均衡</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">审方超时时间</div>
+                                <div class="detail-value">
+                                    <input type="number" value="30" style="padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px; width: 100px;"> 分钟
+                                </div>
+                            </div>
+                        </div>
+                        <div class="detail-section">
+                            <h3>系统通知设置</h3>
+                            <div class="detail-row">
+                                <div class="detail-label">新处方通知</div>
+                                <div class="detail-value">
+                                    <input type="checkbox" checked>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">审方超时通知</div>
+                                <div class="detail-value">
+                                    <input type="checkbox" checked>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <button class="btn btn-primary">保存设置</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- 处方审核详情页 -->
+    <div id="prescription-detail-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 class="modal-title">处方审核详情</h2>
+                <button class="modal-close" onclick="closePrescriptionDetail()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 人脸识别 -->
+                <div class="face-recognition">
+                    <h3>人脸识别验证</h3>
+                    <p>请将面部置于摄像头前进行识别</p>
+                    <canvas width="320" height="240"></canvas>
+                    <button class="btn btn-primary" onclick="startFaceRecognition()">开始识别</button>
+                </div>
+                
+                <!-- 处方信息 -->
+                <div class="prescription-detail">
+                    <div class="detail-section">
+                        <h3>处方基本信息</h3>
+                        <div class="detail-row">
+                            <div class="detail-label">处方编号</div>
+                            <div class="detail-value">RX202602270001</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">患者姓名</div>
+                            <div class="detail-value">王小明</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">患者年龄</div>
+                            <div class="detail-value">35岁</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">患者性别</div>
+                            <div class="detail-value">男</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">开具医师</div>
+                            <div class="detail-value">李医生</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">开具时间</div>
+                            <div class="detail-value">2026-02-27 10:30</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">诊断信息</div>
+                            <div class="detail-value">上呼吸道感染</div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h3>药品信息</h3>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>药品名称</th>
+                                    <th>规格</th>
+                                    <th>用法用量</th>
+                                    <th>数量</th>
+                                    <th>单价</th>
+                                    <th>金额</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>阿莫西林胶囊</td>
+                                    <td>0.25g*24粒</td>
+                                    <td>口服，一次2粒，一日3次</td>
+                                    <td>2盒</td>
+                                    <td>25.00</td>
+                                    <td>50.00</td>
+                                </tr>
+                                <tr>
+                                    <td>布洛芬缓释胶囊</td>
+                                    <td>0.3g*10粒</td>
+                                    <td>口服，一次1粒，一日2次</td>
+                                    <td>1盒</td>
+                                    <td>35.00</td>
+                                    <td>35.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div style="text-align: right; margin-top: 10px;">
+                            <strong>合计金额：¥85.00</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h3>审核意见</h3>
+                        <textarea rows="4" style="width: 100%; padding: 10px; border: 1px solid #d9d9d9; border-radius: 4px; resize: none;"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" onclick="rejectPrescription()">拒绝</button>
+                <button class="btn btn-success" onclick="approvePrescription()">通过</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 登录功能
+        function login() {
+            const role = document.getElementById('role').value;
+            document.getElementById('login-page').classList.add('hidden');
+            if (role === 'pharmacist') {
+                document.getElementById('pharmacist-dashboard').classList.remove('hidden');
+            } else {
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+            }
+        }
+        
+        // 退出登录
+        function logout() {
+            document.getElementById('pharmacist-dashboard').classList.add('hidden');
+            document.getElementById('admin-dashboard').classList.add('hidden');
+            document.getElementById('login-page').classList.remove('hidden');
+        }
+        
+        // 显示药剂师工作台 sections
+        function showSection(section) {
+            // 隐藏所有 sections
+            document.getElementById('dashboard-section').classList.add('hidden');
+            document.getElementById('prescriptions-section').classList.add('hidden');
+            document.getElementById('profile-section').classList.add('hidden');
+            
+            // 显示选中的 section
+            document.getElementById(section + '-section').classList.remove('hidden');
+            
+            // 更新标题
+            document.getElementById('section-title').textContent = {
+                'dashboard': '工作台',
+                'prescriptions': '处方列表',
+                'profile': '个人中心'
+            }[section];
+            
+            // 更新侧边栏激活状态
+            const menuItems = document.querySelectorAll('.sidebar-menu a');
+            menuItems.forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        
+        // 显示管理员后台 sections
+        function showAdminSection(section) {
+            // 隐藏所有 sections
+            document.getElementById('admin-dashboard-section').classList.add('hidden');
+            document.getElementById('admin-pharmacists-section').classList.add('hidden');
+            document.getElementById('admin-prescriptions-section').classList.add('hidden');
+            document.getElementById('admin-settings-section').classList.add('hidden');
+            
+            // 显示选中的 section
+            document.getElementById('admin-' + section + '-section').classList.remove('hidden');
+            
+            // 更新标题
+            document.getElementById('admin-section-title').textContent = {
+                'dashboard': '工作台',
+                'pharmacists': '药剂师管理',
+                'prescriptions': '处方管理',
+                'settings': '系统设置'
+            }[section];
+            
+            // 更新侧边栏激活状态
+            const menuItems = document.querySelectorAll('.sidebar-menu a');
+            menuItems.forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        
+        // 查看处方详情
+        function viewPrescription(prescriptionId) {
+            document.getElementById('prescription-detail-modal').classList.remove('hidden');
+        }
+        
+        // 关闭处方详情
+        function closePrescriptionDetail() {
+            document.getElementById('prescription-detail-modal').classList.add('hidden');
+        }
+        
+        // 开始人脸识别
+        function startFaceRecognition() {
+            alert('开始人脸识别...');
+            // 模拟人脸识别成功
+            setTimeout(() => {
+                alert('人脸识别成功！');
+            }, 2000);
+        }
+        
+        // 审核通过
+        function approvePrescription() {
+            alert('处方审核通过，已加盖电子签名！');
+            closePrescriptionDetail();
+        }
+        
+        // 审核拒绝
+        function rejectPrescription() {
+            alert('处方审核拒绝，已返回医师处方系统！');
+            closePrescriptionDetail();
+        }
+        
+        // 添加药剂师
+        function addPharmacist() {
+            alert('添加药剂师');
+        }
+        
+        // 编辑药剂师
+        function editPharmacist(pharmacistId) {
+            alert('编辑药剂师：' + pharmacistId);
+        }
+        
+        // 删除药剂师
+        function deletePharmacist(pharmacistId) {
+            if (confirm('确定要删除该药剂师吗？')) {
+                alert('药剂师已删除');
+            }
+        }
+    </script>
+</body>
+</html>

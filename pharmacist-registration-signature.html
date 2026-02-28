@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>药剂师注册与电子签名设置</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 导航栏 */
+        .navbar {
+            background-color: #001529;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar-logo {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .navbar-menu a {
+            color: rgba(255,255,255,0.65);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .navbar-menu a:hover,
+        .navbar-menu a.active {
+            color: white;
+        }
+        
+        /* 主内容区 */
+        .content {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .form-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        .form-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .form-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .form-subtitle {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* 表单样式 */
+        .form-step {
+            display: none;
+        }
+        
+        .form-step.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        /* 证件上传 */
+        .upload-section {
+            border: 2px dashed #d9d9d9;
+            border-radius: 4px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .upload-section:hover {
+            border-color: #1890ff;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            color: #d9d9d9;
+            margin-bottom: 10px;
+        }
+        
+        .upload-text {
+            margin-bottom: 10px;
+            color: #666;
+        }
+        
+        .upload-hint {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .upload-btn {
+            margin-top: 10px;
+        }
+        
+        .file-list {
+            margin-top: 10px;
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #e8e8e8;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .file-icon {
+            font-size: 20px;
+            color: #1890ff;
+        }
+        
+        .file-name {
+            font-size: 14px;
+        }
+        
+        .file-size {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .file-remove {
+            color: #ff4d4f;
+            cursor: pointer;
+        }
+        
+        /* 步骤指示器 */
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+        
+        .step::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #e8e8e8;
+            z-index: 1;
+        }
+        
+        .step:first-child::before {
+            left: 50%;
+        }
+        
+        .step:last-child::before {
+            right: 50%;
+        }
+        
+        .step-number {
+            position: relative;
+            z-index: 2;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #e8e8e8;
+            color: #999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 10px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .step.active .step-number {
+            background-color: #1890ff;
+            color: white;
+        }
+        
+        .step.completed .step-number {
+            background-color: #52c41a;
+            color: white;
+        }
+        
+        .step-title {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .step.active .step-title,
+        .step.completed .step-title {
+            color: #333;
+            font-weight: 500;
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #1890ff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #40a9ff;
+        }
+        
+        .btn-secondary {
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #d9d9d9;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e8e8e8;
+        }
+        
+        .btn-success {
+            background-color: #52c41a;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #73d13d;
+        }
+        
+        .btn-danger {
+            background-color: #ff4d4f;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #ff7875;
+        }
+        
+        .btn-block {
+            width: 100%;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+        
+        /* 电子签名设置 */
+        .signature-section {
+            margin-bottom: 30px;
+        }
+        
+        .signature-preview {
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            padding: 20px;
+            min-height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .signature-placeholder {
+            color: #999;
+            text-align: center;
+        }
+        
+        .signature-image {
+            max-width: 100%;
+            max-height: 150px;
+        }
+        
+        .signature-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .signature-draw {
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .draw-area {
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            min-height: 200px;
+            background-color: white;
+        }
+        
+        .draw-controls {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-top: 1px solid #d9d9d9;
+        }
+        
+        .draw-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid #d9d9d9;
+            cursor: pointer;
+        }
+        
+        .draw-color.black {
+            background-color: black;
+        }
+        
+        .draw-color.red {
+            background-color: red;
+        }
+        
+        .draw-color.blue {
+            background-color: blue;
+        }
+        
+        .draw-size {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .draw-size input {
+            width: 100px;
+        }
+        
+        /* 提示信息 */
+        .info-box {
+            background-color: #e6f7ff;
+            border: 1px solid #91d5ff;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box-title {
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #1890ff;
+        }
+        
+        .info-box-content {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.5;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn-group .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 导航栏 -->
+        <nav class="navbar">
+            <div class="navbar-logo">药剂师审方平台</div>
+            <div class="navbar-menu">
+                <a href="#" class="active">注册</a>
+                <a href="#">登录</a>
+                <a href="#">帮助</a>
+            </div>
+        </nav>
+        
+        <!-- 主内容区 -->
+        <main class="content">
+            <div class="form-container">
+                <!-- 注册表单 -->
+                <div id="registration-form">
+                    <div class="form-header">
+                        <h1 class="form-title">药剂师注册</h1>
+                        <p class="form-subtitle">请填写以下信息完成注册</p>
+                    </div>
+                    
+                    <!-- 步骤指示器 -->
+                    <div class="step-indicator">
+                        <div class="step active">
+                            <div class="step-number">1</div>
+                            <div class="step-title">基本信息</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-title">证件上传</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-title">身份认证</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-title">完成注册</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 步骤1：基本信息 -->
+                    <div class="form-step active" id="step1">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="name">姓名</label>
+                                <input type="text" id="name" placeholder="请输入真实姓名">
+                            </div>
+                            <div class="form-group">
+                                <label for="gender">性别</label>
+                                <select id="gender">
+                                    <option value="">请选择</option>
+                                    <option value="male">男</option>
+                                    <option value="female">女</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="id-card">身份证号</label>
+                                <input type="text" id="id-card" placeholder="请输入身份证号">
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">联系电话</label>
+                                <input type="tel" id="phone" placeholder="请输入手机号码">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">邮箱</label>
+                            <input type="email" id="email" placeholder="请输入邮箱地址">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="institution">所属机构</label>
+                            <input type="text" id="institution" placeholder="请输入所属医疗机构">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="license-number">执业证书号</label>
+                                <input type="text" id="license-number" placeholder="请输入执业药师证书号">
+                            </div>
+                            <div class="form-group">
+                                <label for="license-expiry">证书有效期至</label>
+                                <input type="date" id="license-expiry">
+                            </div>
+                        </div>
+                        
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="nextStep(1)">下一步</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 步骤2：证件上传 -->
+                    <div class="form-step" id="step2">
+                        <div class="info-box">
+                            <div class="info-box-title">上传要求</div>
+                            <div class="info-box-content">
+                                <p>1. 请上传清晰的证件照片，确保信息完整可见</p>
+                                <p>2. 支持JPG、PNG格式，文件大小不超过5MB</p>
+                                <p>3. 请确保上传的证件在有效期内</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>身份证正面</label>
+                            <div class="upload-section">
+                                <div class="upload-icon">📄</div>
+                                <div class="upload-text">点击或拖拽文件到此处上传</div>
+                                <div class="upload-hint">支持JPG、PNG格式，不超过5MB</div>
+                                <input type="file" style="display: none;" id="id-front" accept=".jpg,.jpeg,.png">
+                                <button class="btn btn-primary upload-btn" onclick="document.getElementById('id-front').click()">选择文件</button>
+                            </div>
+                            <div class="file-list" id="id-front-list"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>身份证反面</label>
+                            <div class="upload-section">
+                                <div class="upload-icon">📄</div>
+                                <div class="upload-text">点击或拖拽文件到此处上传</div>
+                                <div class="upload-hint">支持JPG、PNG格式，不超过5MB</div>
+                                <input type="file" style="display: none;" id="id-back" accept=".jpg,.jpeg,.png">
+                                <button class="btn btn-primary upload-btn" onclick="document.getElementById('id-back').click()">选择文件</button>
+                            </div>
+                            <div class="file-list" id="id-back-list"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>执业药师证书</label>
+                            <div class="upload-section">
+                                <div class="upload-icon">📄</div>
+                                <div class="upload-text">点击或拖拽文件到此处上传</div>
+                                <div class="upload-hint">支持JPG、PNG格式，不超过5MB</div>
+                                <input type="file" style="display: none;" id="license" accept=".jpg,.jpeg,.png">
+                                <button class="btn btn-primary upload-btn" onclick="document.getElementById('license').click()">选择文件</button>
+                            </div>
+                            <div class="file-list" id="license-list"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>近期免冠照片</label>
+                            <div class="upload-section">
+                                <div class="upload-icon">📄</div>
+                                <div class="upload-text">点击或拖拽文件到此处上传</div>
+                                <div class="upload-hint">支持JPG、PNG格式，不超过5MB</div>
+                                <input type="file" style="display: none;" id="photo" accept=".jpg,.jpeg,.png">
+                                <button class="btn btn-primary upload-btn" onclick="document.getElementById('photo').click()">选择文件</button>
+                            </div>
+                            <div class="file-list" id="photo-list"></div>
+                        </div>
+                        
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" onclick="prevStep(2)">上一步</button>
+                            <button class="btn btn-primary" onclick="nextStep(2)">下一步</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 步骤3：身份认证 -->
+                    <div class="form-step" id="step3">
+                        <div class="info-box">
+                            <div class="info-box-title">身份认证</div>
+                            <div class="info-box-content">
+                                <p>请完成人脸识别验证，确保是本人操作</p>
+                            </div>
+                        </div>
+                        
+                        <div class="upload-section">
+                            <h3>人脸识别验证</h3>
+                            <p>请将面部置于摄像头前进行识别</p>
+                            <div style="margin: 20px 0;">
+                                <video id="video" width="320" height="240" autoplay></video>
+                                <canvas id="canvas" style="display: none;"></canvas>
+                            </div>
+                            <button class="btn btn-primary" onclick="startFaceRecognition()">开始识别</button>
+                        </div>
+                        
+                        <div class="info-box" style="margin-top: 20px;">
+                            <div class="info-box-title">无法使用摄像头？</div>
+                            <div class="info-box-content">
+                                <p>如果您的设备没有摄像头，可以使用手机扫码完成认证</p>
+                                <div style="text-align: center; margin: 20px 0;">
+                                    <div style="display: inline-block; padding: 20px; background-color: white; border: 1px solid #d9d9d9; border-radius: 4px;">
+                                        <div style="font-size: 12px; margin-bottom: 10px;">请使用医院APP扫码</div>
+                                        <div style="width: 200px; height: 200px; background-color: #f5f5f5; display: flex; justify-content: center; align-items: center;">
+                                            <span>二维码</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" onclick="prevStep(3)">上一步</button>
+                            <button class="btn btn-primary" onclick="nextStep(3)">下一步</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 步骤4：完成注册 -->
+                    <div class="form-step" id="step4">
+                        <div class="info-box">
+                            <div class="info-box-title">注册完成</div>
+                            <div class="info-box-content">
+                                <p>您的注册信息已提交成功，我们将在1-3个工作日内审核您的资料</p>
+                                <p>审核通过后，您将收到短信通知，届时可以登录系统</p>
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: center; margin: 40px 0;">
+                            <div style="font-size: 48px; margin-bottom: 20px;">✅</div>
+                            <h3>注册提交成功</h3>
+                            <p style="color: #666; margin-top: 10px;">您的申请正在审核中，请耐心等待</p>
+                        </div>
+                        
+                        <div class="btn-group">
+                            <button class="btn btn-primary btn-block" onclick="window.location.href='#'">返回登录</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 电子签名设置 -->
+                <div id="signature-setting" style="display: none;">
+                    <div class="form-header">
+                        <h1 class="form-title">电子签名设置</h1>
+                        <p class="form-subtitle">请设置您的电子签名，用于处方审核</p>
+                    </div>
+                    
+                    <div class="info-box">
+                        <div class="info-box-title">电子签名说明</div>
+                        <div class="info-box-content">
+                            <p>1. 电子签名将用于处方审核通过后的签章</p>
+                            <p>2. 请确保签名清晰可辨，代表您的真实身份</p>
+                            <p>3. 签名一旦设置，如需修改需要重新审核</p>
+                        </div>
+                    </div>
+                    
+                    <div class="signature-section">
+                        <h3>签名预览</h3>
+                        <div class="signature-preview" id="signature-preview">
+                            <div class="signature-placeholder">
+                                <div style="font-size: 32px; margin-bottom: 10px;">📝</div>
+                                <div>请上传或绘制您的签名</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <h3>上传签名</h3>
+                        <div class="upload-section">
+                            <div class="upload-icon">📄</div>
+                            <div class="upload-text">点击或拖拽文件到此处上传</div>
+                            <div class="upload-hint">支持JPG、PNG格式，不超过2MB</div>
+                            <input type="file" style="display: none;" id="signature-upload" accept=".jpg,.jpeg,.png">
+                            <button class="btn btn-primary upload-btn" onclick="document.getElementById('signature-upload').click()">选择文件</button>
+                        </div>
+                        <div class="file-list" id="signature-list"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <h3>绘制签名</h3>
+                        <div class="signature-draw">
+                            <div class="draw-area" id="draw-area"></div>
+                            <div class="draw-controls">
+                                <div>
+                                    <span>颜色：</span>
+                                    <div class="draw-color black active" data-color="black"></div>
+                                    <div class="draw-color red" data-color="red"></div>
+                                    <div class="draw-color blue" data-color="blue"></div>
+                                </div>
+                                <div class="draw-size">
+                                    <span>粗细：</span>
+                                    <input type="range" min="1" max="10" value="2" id="draw-size">
+                                </div>
+                                <button class="btn btn-secondary" onclick="clearSignature()">清空</button>
+                                <button class="btn btn-primary" onclick="saveSignature()">保存</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="window.location.href='#'">取消</button>
+                        <button class="btn btn-success" onclick="submitSignature()">提交签名</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // 步骤导航
+        function nextStep(currentStep) {
+            document.getElementById('step' + currentStep).classList.remove('active');
+            document.getElementById('step' + (currentStep + 1)).classList.add('active');
+            
+            // 更新步骤指示器
+            const steps = document.querySelectorAll('.step');
+            steps[currentStep - 1].classList.remove('active');
+            steps[currentStep - 1].classList.add('completed');
+            steps[currentStep].classList.add('active');
+        }
+        
+        function prevStep(currentStep) {
+            document.getElementById('step' + currentStep).classList.remove('active');
+            document.getElementById('step' + (currentStep - 1)).classList.add('active');
+            
+            // 更新步骤指示器
+            const steps = document.querySelectorAll('.step');
+            steps[currentStep - 1].classList.remove('active');
+            steps[currentStep - 2].classList.remove('completed');
+            steps[currentStep - 2].classList.add('active');
+        }
+        
+        // 文件上传处理
+        function handleFileUpload(inputId, listId) {
+            const input = document.getElementById(inputId);
+            const list = document.getElementById(listId);
+            
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const fileSize = (file.size / 1024 / 1024).toFixed(2);
+                    if (fileSize > 5) {
+                        alert('文件大小不能超过5MB');
+                        return;
+                    }
+                    
+                    list.innerHTML = `
+                        <div class="file-item">
+                            <div class="file-info">
+                                <div class="file-icon">📄</div>
+                                <div>
+                                    <div class="file-name">${file.name}</div>
+                                    <div class="file-size">${fileSize} MB</div>
+                                </div>
+                            </div>
+                            <div class="file-remove" onclick="removeFile('${inputId}', '${listId}')">删除</div>
+                        </div>
+                    `;
+                }
+            });
+        }
+        
+        // 移除文件
+        function removeFile(inputId, listId) {
+            document.getElementById(inputId).value = '';
+            document.getElementById(listId).innerHTML = '';
+        }
+        
+        // 初始化文件上传
+        handleFileUpload('id-front', 'id-front-list');
+        handleFileUpload('id-back', 'id-back-list');
+        handleFileUpload('license', 'license-list');
+        handleFileUpload('photo', 'photo-list');
+        handleFileUpload('signature-upload', 'signature-list');
+        
+        // 人脸识别
+        function startFaceRecognition() {
+            alert('开始人脸识别...');
+            // 模拟人脸识别成功
+            setTimeout(() => {
+                alert('人脸识别成功！');
+            }, 2000);
+        }
+        
+        // 电子签名绘制
+        let canvas, ctx, isDrawing = false, lastX = 0, lastY = 0;
+        let currentColor = 'black', currentSize = 2;
+        
+        function initDrawArea() {
+            const drawArea = document.getElementById('draw-area');
+            canvas = document.createElement('canvas');
+            canvas.width = drawArea.offsetWidth;
+            canvas.height = 200;
+            drawArea.appendChild(canvas);
+            
+            ctx = canvas.getContext('2d');
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            // 事件监听
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // 触摸支持
+            canvas.addEventListener('touchstart', startDrawing);
+            canvas.addEventListener('touchmove', draw);
+            canvas.addEventListener('touchend', stopDrawing);
+        }
+        
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            if (e.type === 'touchstart') {
+                lastX = e.touches[0].clientX - rect.left;
+                lastY = e.touches[0].clientY - rect.top;
+            } else {
+                lastX = e.clientX - rect.left;
+                lastY = e.clientY - rect.top;
+            }
+        }
+        
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            let currentX, currentY;
+            
+            if (e.type === 'touchmove') {
+                currentX = e.touches[0].clientX - rect.left;
+                currentY = e.touches[0].clientY - rect.top;
+            } else {
+                currentX = e.clientX - rect.left;
+                currentY = e.clientY - rect.top;
+            }
+            
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(currentX, currentY);
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = currentSize;
+            ctx.stroke();
+            
+            lastX = currentX;
+            lastY = currentY;
+        }
+        
+        function stopDrawing() {
+            isDrawing = false;
+        }
+        
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        function saveSignature() {
+            const signatureData = canvas.toDataURL('image/png');
+            document.getElementById('signature-preview').innerHTML = `<img src="${signatureData}" class="signature-image">`;
+            alert('签名已保存！');
+        }
+        
+        function submitSignature() {
+            alert('电子签名已提交，等待审核通过后即可使用！');
+        }
+        
+        // 颜色选择
+        document.querySelectorAll('.draw-color').forEach(color => {
+            color.addEventListener('click', function() {
+                document.querySelectorAll('.draw-color').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                currentColor = this.dataset.color;
+            });
+        });
+        
+        // 粗细调整
+        document.getElementById('draw-size').addEventListener('input', function() {
+            currentSize = this.value;
+        });
+        
+        // 初始化绘制区域
+        window.onload = function() {
+            initDrawArea();
+        };
+        
+        // 切换到电子签名设置
+        function goToSignatureSetting() {
+            document.getElementById('registration-form').style.display = 'none';
+            document.getElementById('signature-setting').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
