@@ -163,6 +163,7 @@
         .user-info {
             display: flex;
             align-items: center;
+            gap: 20px;
         }
         
         .user-avatar {
@@ -175,6 +176,116 @@
             justify-content: center;
             align-items: center;
             margin-right: 10px;
+        }
+        
+        /* 消息中心 */
+        .message-center {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .message-icon {
+            font-size: 20px;
+            color: rgba(255,255,255,0.65);
+            transition: all 0.3s;
+        }
+        
+        .message-icon:hover {
+            color: white;
+        }
+        
+        .message-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: #ff4d4f;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .message-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 320px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-top: 10px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .message-center:hover .message-dropdown {
+            display: block;
+        }
+        
+        .message-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e8e8e8;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .message-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .message-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .message-item:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .message-item.unread {
+            background-color: #f0f9ff;
+        }
+        
+        .message-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .message-content {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .message-time {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .message-footer {
+            padding: 12px 16px;
+            text-align: center;
+            border-top: 1px solid #e8e8e8;
+        }
+        
+        .message-footer a {
+            color: #1890ff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .message-footer a:hover {
+            text-decoration: underline;
         }
         
         /* 卡片 */
@@ -422,6 +533,41 @@
                 <div class="content-header">
                     <h1 class="content-title" id="section-title">工作台</h1>
                     <div class="user-info">
+                        <div class="message-center">
+                            <div class="message-icon">🔔</div>
+                            <div class="message-badge">3</div>
+                            <div class="message-dropdown">
+                                <div class="message-header">
+                                    <span>消息通知</span>
+                                    <a href="#">全部标为已读</a>
+                                </div>
+                                <div class="message-list">
+                                    <div class="message-item unread">
+                                        <div class="message-title">新处方待审核</div>
+                                        <div class="message-content">处方编号：RX202602280012，患者：张三</div>
+                                        <div class="message-time">10分钟前</div>
+                                    </div>
+                                    <div class="message-item unread">
+                                        <div class="message-title">新处方待审核</div>
+                                        <div class="message-content">处方编号：RX202602280011，患者：李四</div>
+                                        <div class="message-time">30分钟前</div>
+                                    </div>
+                                    <div class="message-item unread">
+                                        <div class="message-title">系统通知</div>
+                                        <div class="message-content">您的电子签名已审核通过</div>
+                                        <div class="message-time">1小时前</div>
+                                    </div>
+                                    <div class="message-item">
+                                        <div class="message-title">处方审核完成</div>
+                                        <div class="message-content">处方编号：RX202602280010，审核状态：通过</div>
+                                        <div class="message-time">2小时前</div>
+                                    </div>
+                                </div>
+                                <div class="message-footer">
+                                    <a href="#">查看全部消息</a>
+                                </div>
+                            </div>
+                        </div>
                         <div class="user-avatar">张</div>
                         <span>张药师</span>
                     </div>
@@ -587,6 +733,36 @@
                 <div class="content-header">
                     <h1 class="content-title" id="admin-section-title">工作台</h1>
                     <div class="user-info">
+                        <div class="message-center">
+                            <div class="message-icon">🔔</div>
+                            <div class="message-badge">2</div>
+                            <div class="message-dropdown">
+                                <div class="message-header">
+                                    <span>消息通知</span>
+                                    <a href="#">全部标为已读</a>
+                                </div>
+                                <div class="message-list">
+                                    <div class="message-item unread">
+                                        <div class="message-title">新药剂师注册</div>
+                                        <div class="message-content">药剂师：王五，执业证书号：987654321098765432</div>
+                                        <div class="message-time">15分钟前</div>
+                                    </div>
+                                    <div class="message-item unread">
+                                        <div class="message-title">系统通知</div>
+                                        <div class="message-content">今日审方量已达100单</div>
+                                        <div class="message-time">1小时前</div>
+                                    </div>
+                                    <div class="message-item">
+                                        <div class="message-title">药剂师审核完成</div>
+                                        <div class="message-content">药剂师：赵六，审核状态：通过</div>
+                                        <div class="message-time">3小时前</div>
+                                    </div>
+                                </div>
+                                <div class="message-footer">
+                                    <a href="#">查看全部消息</a>
+                                </div>
+                            </div>
+                        </div>
                         <div class="user-avatar">管</div>
                         <span>管理员</span>
                     </div>
@@ -950,6 +1126,50 @@
         function viewPrescription(prescriptionId) {
             document.getElementById('prescription-detail-modal').classList.remove('hidden');
         }
+        
+        // 消息中心交互
+        document.addEventListener('DOMContentLoaded', function() {
+            // 点击消息标记为已读
+            const messageItems = document.querySelectorAll('.message-item');
+            messageItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    this.classList.remove('unread');
+                    
+                    // 更新消息徽章数量
+                    const messageBadge = this.closest('.message-center').querySelector('.message-badge');
+                    if (messageBadge) {
+                        let count = parseInt(messageBadge.textContent);
+                        if (count > 0) {
+                            count--;
+                            if (count === 0) {
+                                messageBadge.style.display = 'none';
+                            } else {
+                                messageBadge.textContent = count;
+                            }
+                        }
+                    }
+                });
+            });
+            
+            // 全部标为已读
+            const markAllRead = document.querySelectorAll('.message-header a');
+            markAllRead.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const messageList = this.closest('.message-dropdown').querySelector('.message-list');
+                    const unreadItems = messageList.querySelectorAll('.message-item.unread');
+                    unreadItems.forEach(item => {
+                        item.classList.remove('unread');
+                    });
+                    
+                    // 隐藏消息徽章
+                    const messageBadge = this.closest('.message-center').querySelector('.message-badge');
+                    if (messageBadge) {
+                        messageBadge.style.display = 'none';
+                    }
+                });
+            });
+        });
         
         // 关闭处方详情
         function closePrescriptionDetail() {
